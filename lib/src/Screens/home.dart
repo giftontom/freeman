@@ -1,5 +1,6 @@
 // import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mjpeg/flutter_mjpeg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:freeman/src/Screens/cam_view.dart';
@@ -7,14 +8,15 @@ import 'package:freeman/src/Screens/vr_view.dart';
 import 'package:freeman/src/router_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:just_audio/just_audio.dart';
+
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
- class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late AudioPlayer _audioPlayer;
-
+  bool _canExit = false;
   @override
   void initState() {
     super.initState();
@@ -53,98 +55,122 @@ class HomePage extends StatefulWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width * .5,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/wp.png'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: MediaQuery.of(context).size.height,
-                      width: MediaQuery.of(context).size.width * .5,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width * .3,
-                                  height: MediaQuery.of(context).size.width *
-                                      .05241,
-                                  margin: EdgeInsets.all(
-                                    MediaQuery.of(context).size.height * .0533,
-                                  ),
-                                  child: Image.asset(
-                                    "assets/gardro.png",
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width * .5,
-                  decoration: const BoxDecoration(
-                    color: Color.fromRGBO(0, 0, 0, 1),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      bottomLeft: Radius.circular(40),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+    return WillPopScope(
+       onWillPop: () async {
+          if (_canExit) {
+            // If _canExit is true, allow the app to exit
+            return true;
+          } else {
+            // Show a snackbar or dialog to confirm exit
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Press again to exit'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+             _canExit = true;
+            // Set _canExit to true after a delay
+            Future.delayed(Duration(seconds: 2), () {
+              _canExit = false;
+            });
+
+            // Prevent the app from exiting
+            return false;
+          }
+        },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Stack(
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * .4,
-                            height:
-                                MediaQuery.of(context).size.width * .0705241,
-                            margin: EdgeInsets.all(
-                              MediaQuery.of(context).size.height * .0833,
-                            ),
-                            child: Image.asset(
-                              "assets/gardroTagline.png",
-                              fit: BoxFit.cover,
-                            ),
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width * .5,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/wp.png'),
+                            fit: BoxFit.cover,
                           ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Padding(
-                        padding: EdgeInsets.all(
-                          MediaQuery.of(context).size.height * .08,
                         ),
-                        child: GameIdInput(),
+                      ),
+                      Container(
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width * .5,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: MediaQuery.of(context).size.width * .3,
+                                    height: MediaQuery.of(context).size.width *
+                                        .05241,
+                                    margin: EdgeInsets.all(
+                                      MediaQuery.of(context).size.height * .0533,
+                                    ),
+                                    child: Image.asset(
+                                      "assets/gardro.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                )
-              ],
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width * .5,
+                    decoration: const BoxDecoration(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(40),
+                        bottomLeft: Radius.circular(40),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width * .4,
+                              height:
+                                  MediaQuery.of(context).size.width * .0705241,
+                              margin: EdgeInsets.all(
+                                MediaQuery.of(context).size.height * .0833,
+                              ),
+                              child: Image.asset(
+                                "assets/gardroTagline.png",
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Padding(
+                          padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.height * .08,
+                          ),
+                          child: GameIdInput(),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -242,6 +268,7 @@ class _GameIdInputState extends State<GameIdInput> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     return Column(
       children: [
         TextField(
@@ -254,7 +281,6 @@ class _GameIdInputState extends State<GameIdInput> {
             labelText: 'Enter IP Address',
             hintText: 'eg: 193.38.18',
             filled: true,
-            
             labelStyle: const TextStyle(
               color: Color.fromRGBO(200, 198, 188, 1),
             ),
@@ -298,16 +324,45 @@ class _GameIdInputState extends State<GameIdInput> {
         SizedBox(
           height: MediaQuery.of(context).size.height * .04266,
         ),
-        ElevatedButton(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // ElevatedButton(
+            //   onPressed: () {
+            //     Routes.pushReplacementNamed(Routes.vegList);
+
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     primary: Colors.grey[900],
+            //     onPrimary: Color.fromRGBO(200, 198, 188, 1),
+            //     elevation: 5,
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(20.0),
+            //     ),
+            //   ),
+            //   child: Padding(
+            //     padding: EdgeInsets.all(
+            //       MediaQuery.of(context).size.height * .032,
+            //     ),
+            //     child: Text(
+            //       'Lerning Modules',
+            //       style: TextStyle(
+            //         fontWeight: FontWeight.w500,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+             ElevatedButton(
           onPressed: () {
-        if(_urlController.text!="")   {   Navigator.of(context).pushReplacement(
+            if (_urlController.text != "") {
+              Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (context) => MonitoringPage(
                     ipAddres: _urlController.text,
                   ), // Replace with your home screen widget
-                ) ,
-              );}
-            
+                ),
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             primary: Colors.grey[900],
@@ -329,6 +384,9 @@ class _GameIdInputState extends State<GameIdInput> {
             ),
           ),
         )
+          ],
+        ),
+       
       ],
     );
   }

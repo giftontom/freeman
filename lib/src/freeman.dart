@@ -20,7 +20,7 @@ class FreemanApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       routes: Routes.routes,
       debugShowCheckedModeBanner: false,
-      initialRoute: Routes.home,
+      initialRoute: Routes.splash,
     );
   }
 }
